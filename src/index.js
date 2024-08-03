@@ -17,28 +17,41 @@ app.use(cors(corsOptions));
 
 initializeDatabase();
 
-async function getAllProducts() {
+async function getProductsByCategory(categoryType) {
   try {
-    const allProducts = await Products.find();
-    return allProducts;
+    const products = await Products.find({ category: categoryType });
+    return { products: products };
   } catch (error) {
     throw error;
   }
 }
 
-app.get("/products", async (req, res) => {
+async function getAllProducts() {
   try {
-    const products = await getAllProducts();
-    if (products.length !== 0) {
-      res.status(200).json({
-        message: "fetched all Products successfully",
-        product: products,
-      });
-    } else {
-      res.status(404).json({ error: "Products not found" });
-    }
+    const products = await Products.find();
+    return { products: products };
   } catch (error) {
-    res.status(500).json({ error: "failed to fetch" });
+    throw error;
+  }
+}
+
+app.get("/products/:categoryType", async (req, res) => {
+  try {
+    const categoryType = req.params.categoryType;
+    let response;
+    if (categoryType === "All") {
+      response = await getAllProducts();
+    } else {
+      response = await getProductsByCategory(categoryType);
+    }
+
+    if (response.products.length === 0) {
+      res.status(404).json({ message: "No Products Found" });
+    }
+
+    return res.status(200).json(response);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
