@@ -50,8 +50,8 @@ app.get("/products/:categoryType", async (req, res) => {
     }
 
     return res.status(200).json(response);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
