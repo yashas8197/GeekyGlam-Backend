@@ -46,7 +46,7 @@ app.get("/products/:categoryType", async (req, res) => {
     }
 
     if (response.products.length === 0) {
-      res.status(404).json({ message: "No Products Found" });
+      return res.status(404).json({ message: "No Products Found" });
     }
 
     return res.status(200).json(response);
@@ -57,26 +57,25 @@ app.get("/products/:categoryType", async (req, res) => {
 
 async function getProductById(productId) {
   try {
-    const productById = await Products.findById(productId);
-    return productById;
+    const product = await Products.findById(productId);
+    return product;
   } catch (error) {
     throw error;
   }
 }
 
-app.get("/products/:productId", async (req, res) => {
+app.get("/product/:productId", async (req, res) => {
+  const { productId } = req.params;
   try {
-    const product = await getProductById(req.params.productId);
-    if (product.length !== 0) {
-      res.status(200).json({
-        message: "fetched Product successfully",
-        product: product,
-      });
+    const product = await getProductById(productId);
+    if (product) {
+      res.status(200).json({ message: "Product fetching successful", product });
     } else {
-      res.status(404).json({ error: "Product not found" });
+      res.status(404).json({ message: "Product not found." });
     }
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch data" });
+    console.log(error);
+    res.status(500).json({ error: "failed to fetch Product" });
   }
 });
 
