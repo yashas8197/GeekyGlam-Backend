@@ -2,10 +2,8 @@ const { initializeDatabase } = require("./db/db.connect");
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const fs = require("fs");
 
 const Products = require("./models/products.model");
-const Reviews = require("./models/reviews.model");
 const WishList = require("./models/wishlist.model");
 
 app.use(express.json());
@@ -19,31 +17,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 initializeDatabase();
-
-// const jsonData = fs.readFileSync("reviews.json", "utf8");
-// const reviewsData = JSON.parse(jsonData);
-
-/* async function seedData() {
-  try {
-    for (const reviewData of reviewsData) {
-      const newReview = new Reviews({
-        name: reviewData.name,
-        ratings: reviewData.ratings,
-        avatarPhoto: reviewData.avatarPhoto,
-        date: reviewData.date,
-        reviews: reviewData.reviews,
-        email: reviewData.email,
-      });
-
-      await newReview.save();
-      console.log("product data", newReview.title);
-    }
-  } catch (error) {
-    console.log("Error seeding the data", error);
-  }
-} */
-
-// seedData();
 
 async function getProductsByCategory(categoryType) {
   try {
