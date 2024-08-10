@@ -134,6 +134,33 @@ app.post("/wishlist", async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 });
+
+async function getSearchSuggestionByTitle(productTitle) {
+  try {
+    const productSearchByTitle = await Products.find({
+      title: { $regex: productTitle, $options: "i" },
+    });
+    return productSearchByTitle;
+  } catch (error) {
+    throw error;
+  }
+}
+
+app.get("/products", async (req, res) => {
+  try {
+    const q = req.query.q;
+    const matchesProductTitle = await getSearchSuggestionByTitle(q);
+    if (matchesProductTitle.length > 0) {
+      res.status(200).json({ products: matchesProductTitle });
+    } else {
+      res.status(404).json({ error: "No Products Found" });
+    }
+  } catch (error) {
+    console.error("Error in /products/search endpoint:", error);
+    res.status(500).json({ error: "Failed to fetch" });
+  }
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`server connected to port http://localhost:${PORT}`);
