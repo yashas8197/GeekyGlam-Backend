@@ -75,63 +75,55 @@ app.get("/product/:productId", async (req, res) => {
       res.status(404).json({ message: "Product not found." });
     }
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "failed to fetch Product" });
   }
 });
 
-app.get("/wishlist", async (req, res) => {
+app.get("/api/wishlist", async (req, res) => {
   try {
     const wishlists = await WishList.find();
     res.status(200).json(wishlists);
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 
-async function addWishlist(productId) {
+app.post("/api/wishlist", async (req, res) => {
+  const {
+    image,
+    category,
+    rating,
+    size,
+    description,
+    title,
+    trending,
+    original_price,
+    price,
+    delivery_time,
+    reviews,
+    in_stock,
+  } = req.body;
+
+  const wishlistItem = new WishList({
+    image,
+    category,
+    rating,
+    size,
+    description,
+    title,
+    trending,
+    original_price,
+    price,
+    delivery_time,
+    reviews,
+    in_stock,
+  });
+
   try {
-    let wishlist = await WishList.findOne();
-
-    if (!wishlist) {
-      wishlist = new WishList({
-        items: [{ productId, count: 1 }],
-      });
-      await wishlist.save();
-      return res.status(201).json(wishlist);
-    }
-
-    const itemIndex = wishlist.items.findIndex(
-      (item) => item.productId.toString() === productId
-    );
-
-    if (itemIndex > -1) {
-      wishlist.items[itemIndex].count += 1;
-    } else {
-      wishlist.items.push({ productId, count: 1 });
-    }
-
-    await wishlist.save();
-
-    return wishlist;
-  } catch (error) {
-    throw error;
-  }
-}
-
-app.post("/wishlist", async (req, res) => {
-  try {
-    const { productId } = req.body;
-
-    if (!productId) {
-      return res.status(400).json({ message: "Product ID is required" });
-    }
-
-    const response = await addWishlist(productId);
-
-    res.status(200).json(response);
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    const newItem = await wishlistItem.save();
+    res.status(201).json(newItem);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 });
 
@@ -156,7 +148,6 @@ app.get("/products", async (req, res) => {
       res.status(404).json({ error: "No Products Found" });
     }
   } catch (error) {
-    console.error("Error in /products/search endpoint:", error);
     res.status(500).json({ error: "Failed to fetch" });
   }
 });
