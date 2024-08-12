@@ -79,7 +79,7 @@ app.get("/product/:productId", async (req, res) => {
   }
 });
 
-app.get("/api/wishlist", async (req, res) => {
+app.get("/wishlist", async (req, res) => {
   try {
     const wishlists = await WishList.find();
     res.status(200).json(wishlists);
@@ -88,7 +88,7 @@ app.get("/api/wishlist", async (req, res) => {
   }
 });
 
-app.post("/api/wishlist", async (req, res) => {
+app.post("/wishlist", async (req, res) => {
   const {
     image,
     category,
