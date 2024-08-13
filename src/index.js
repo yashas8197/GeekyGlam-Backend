@@ -79,51 +79,38 @@ app.get("/product/:productId", async (req, res) => {
   }
 });
 
-app.get("/wishlist", async (req, res) => {
+async function updateProductById(productId, dataToUpdate) {
   try {
-    const wishlists = await WishList.find();
-    res.status(200).json(wishlists);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    const updatedProduct = await Products.findByIdAndUpdate(
+      productId,
+      dataToUpdate,
+      {
+        new: true,
+      }
+    );
+
+    return updatedProduct;
+  } catch (error) {
+    throw error;
   }
-});
+}
 
-app.post("/wishlist", async (req, res) => {
-  const {
-    image,
-    category,
-    rating,
-    size,
-    description,
-    title,
-    trending,
-    original_price,
-    price,
-    delivery_time,
-    reviews,
-    in_stock,
-  } = req.body;
-
-  const wishlistItem = new WishList({
-    image,
-    category,
-    rating,
-    size,
-    description,
-    title,
-    trending,
-    original_price,
-    price,
-    delivery_time,
-    reviews,
-    in_stock,
-  });
-
+app.post("/product/:productId", async (req, res) => {
   try {
-    const newItem = await wishlistItem.save();
-    res.status(201).json(newItem);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
+    const updatedProduct = await updateProductById(
+      req.params.productId,
+      req.body
+    );
+
+    if (updatedProduct) {
+      return res
+        .status(200)
+        .json({ message: "product updated successfully", updatedProduct });
+    } else {
+      return res.status(404).json({ message: "Product not found" });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 });
 

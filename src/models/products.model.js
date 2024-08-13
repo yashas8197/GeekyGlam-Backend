@@ -52,6 +52,19 @@ const productsSchema = new mongoose.Schema(
       type: Boolean,
       required: true,
     },
+    is_wished: {
+      type: Boolean,
+      required: true,
+    },
+    in_cart: {
+      type: Boolean,
+      required: true,
+    },
+    quantity: {
+      type: Number,
+      require: true,
+      default: 1,
+    },
   },
   { timestamps: true }
 );
