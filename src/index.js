@@ -114,6 +114,21 @@ app.post("/product/:productId", async (req, res) => {
   }
 });
 
+app.get("/products", async (req, res) => {
+  try {
+    const wishedProducts = await Products.find({ is_wished: true} );
+
+    if (wishedProducts.length > 0) {
+      res.status(200).json({ wishlist: wishedProducts });
+    } else {
+      res.status(404).json({ message: "No items in wishlist" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
 async function getSearchSuggestionByTitle(productTitle) {
   try {
     const productSearchByTitle = await Products.find({
