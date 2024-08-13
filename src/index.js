@@ -132,7 +132,7 @@ app.get("/product", async (req, res) => {
   try {
     const cartItems = await Products.find({ in_cart: true });
     if (cartItems.length > 0) {
-      res.status(200).json({ wishlist: cartItems });
+      res.status(200).json({ cartItems: cartItems });
     } else {
       res.status(404).json({ message: "No items in wishlist" });
     }
