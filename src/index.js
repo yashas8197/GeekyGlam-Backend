@@ -116,7 +116,7 @@ app.post("/product/:productId", async (req, res) => {
 
 app.get("/products", async (req, res) => {
   try {
-    const wishedProducts = await Products.find({ is_wished: true} );
+    const wishedProducts = await Products.find({ is_wished: true });
 
     if (wishedProducts.length > 0) {
       res.status(200).json({ wishlist: wishedProducts });
@@ -128,6 +128,18 @@ app.get("/products", async (req, res) => {
   }
 });
 
+app.get("/product", async (req, res) => {
+  try {
+    const cartItems = await Products.find({ in_cart: true });
+    if (cartItems.length > 0) {
+      res.status(200).json({ wishlist: cartItems });
+    } else {
+      res.status(404).json({ message: "No items in wishlist" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 async function getSearchSuggestionByTitle(productTitle) {
   try {
@@ -140,7 +152,7 @@ async function getSearchSuggestionByTitle(productTitle) {
   }
 }
 
-app.get("/products", async (req, res) => {
+app.get("/productsearch", async (req, res) => {
   try {
     const q = req.query.q;
     const matchesProductTitle = await getSearchSuggestionByTitle(q);
