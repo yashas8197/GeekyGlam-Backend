@@ -48,6 +48,15 @@ const productsSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    reviewsList: [
+      {
+        name: String,
+        ratings: Number,
+        reviews: String,
+        avatarPhoto: String,
+        date: String,
+      },
+    ],
     in_stock: {
       type: Boolean,
       required: true,
