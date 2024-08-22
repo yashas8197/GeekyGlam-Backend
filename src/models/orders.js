@@ -1,22 +1,8 @@
 const mongoose = require("mongoose");
 
-const wishlistSchema = new mongoose.Schema(
+const orderSchema = new mongoose.Schema(
   {
     image: {
-      type: String,
-      required: true,
-    },
-    category: {
-      type: String,
-      required: true,
-    },
-    rating: {
-      type: Number,
-      required: true,
-      min: 0,
-      max: 5,
-    },
-    size: {
       type: String,
       required: true,
     },
@@ -28,9 +14,13 @@ const wishlistSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    trending: {
-      type: Boolean,
-      default: false,
+    category: {
+      type: String,
+      required: true,
+    },
+    size: {
+      type: String,
+      required: true,
     },
     original_price: {
       type: Number,
@@ -44,17 +34,16 @@ const wishlistSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    reviews: {
-      type: String,
-      required: true,
-    },
-    in_stock: {
-      type: Boolean,
-      required: true,
+    quantity: {
+      type: Number,
+      require: true,
+      default: 1,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-const WishList = mongoose.model("WishList", wishlistSchema);
-module.exports = WishList;
+const Order = mongoose.model("Order", orderSchema);
+module.exports = Order;

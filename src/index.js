@@ -1,10 +1,11 @@
 const { initializeDatabase } = require("./db/db.connect");
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
 
 const Products = require("./models/products.model");
-const WishList = require("./models/wishlist.model");
+const Order = require("./models/orders");
 
 app.use(express.json());
 
@@ -17,6 +18,33 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 initializeDatabase();
+
+const seedOrders = async () => {
+  const orders = [
+    {
+      image:
+        "https://res.cloudinary.com/dlrlwy7hg/image/upload/f_webp,q_auto/za2n58grt6tjshfzcy9w.jpg",
+      title: "Cherry Crumble",
+      description: "Boys White Chinese collar neck, Fit & Flare Dress",
+      category: "Kids",
+      size: "M",
+      original_price: 900,
+      price: 499,
+      delivery_time: 3,
+      quantity: 2,
+    },
+  ];
+
+  try {
+    await Order.deleteMany({}); // Clear existing data
+    await Order.insertMany(orders);
+    console.log("Orders seeded successfully");
+  } catch (err) {
+    console.error("Error seeding orders:", err);
+  }
+};
+
+// seedOrders();
 
 async function getProductsByCategory(categoryType) {
   try {
@@ -138,6 +166,84 @@ app.get("/product", async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+app.post("/orders", async (req, res) => {
+  const {
+    image,
+    title,
+    description,
+    category,
+    size,
+    original_price,
+    price,
+    delivery_time,
+    quantity,
+  } = req.body;
+
+  // Basic validation
+  if (
+    !image ||
+    !title ||
+    !original_price ||
+    !price ||
+    !delivery_time ||
+    !description ||
+    !category ||
+    !size
+  ) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    const newOrder = new Order({
+      image,
+      title,
+      description,
+      category,
+      size,
+      original_price,
+      price,
+      delivery_time,
+      quantity: quantity || 1,
+    });
+
+    await newOrder.save();
+    res
+      .status(201)
+      .json({ message: "Order created successfully", order: newOrder });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Get Orders
+app.get("/orders", async (req, res) => {
+  try {
+    const orders = await Order.find();
+    if (orders.length === 0) {
+      return res.status(404).json({ message: "No orders found" });
+    }
+    res.status(200).json({ orders });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete Order
+app.delete("/orders/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deletedOrder = await Order.findByIdAndDelete(id);
+    if (!deletedOrder) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    res
+      .status(200)
+      .json({ message: "Order deleted successfully", deletedOrder });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
   }
 });
 
