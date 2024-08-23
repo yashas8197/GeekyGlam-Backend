@@ -19,33 +19,6 @@ app.use(cors(corsOptions));
 
 initializeDatabase();
 
-const seedOrders = async () => {
-  const orders = [
-    {
-      image:
-        "https://res.cloudinary.com/dlrlwy7hg/image/upload/f_webp,q_auto/za2n58grt6tjshfzcy9w.jpg",
-      title: "Cherry Crumble",
-      description: "Boys White Chinese collar neck, Fit & Flare Dress",
-      category: "Kids",
-      size: "M",
-      original_price: 900,
-      price: 499,
-      delivery_time: 3,
-      quantity: 2,
-    },
-  ];
-
-  try {
-    await Order.deleteMany({}); // Clear existing data
-    await Order.insertMany(orders);
-    console.log("Orders seeded successfully");
-  } catch (err) {
-    console.error("Error seeding orders:", err);
-  }
-};
-
-// seedOrders();
-
 async function getProductsByCategory(categoryType) {
   try {
     const products = await Products.find({ category: categoryType });
@@ -166,6 +139,63 @@ app.get("/product", async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+app.post("/product/reviews/:id", async (req, res) => {
+  const { id } = req.params; // Product ID from the URL
+  const { name, ratings, reviews, avatarPhoto } = req.body; // Review details from the request body
+
+  if (!name || !ratings || !reviews || !avatarPhoto) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  try {
+    const product = await Products.findById(id);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Create a new review object
+    const newReview = {
+      name,
+      ratings,
+      reviews,
+      avatarPhoto,
+    };
+
+    // Add the new review to the reviewsList array
+    product.reviewsList.push(newReview);
+
+    // Save the updated product
+    await product.save();
+
+    return res.status(200).json({
+      message: "Review added successfully",
+      product,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+app.get("/product/reviews/:id", async (req, res) => {
+  const { id } = req.params; // Product ID from the URL
+
+  try {
+    const product = await Products.findById(id, "reviewsList"); // Fetch only the reviewsList field
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    return res.status(200).json({
+      message: "Reviews fetched successfully",
+      reviewsList: product.reviewsList,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 });
 
