@@ -182,7 +182,7 @@ app.post("/orders", async (req, res) => {
     quantity,
     payment_id,
     city,
-    deliverMethod,
+    deliveryMethod,
     state,
     street,
     zip,
@@ -201,7 +201,7 @@ app.post("/orders", async (req, res) => {
     !size ||
     !payment_id ||
     !city ||
-    !deliverMethod ||
+    !deliveryMethod ||
     !state ||
     !street ||
     !zip ||
@@ -223,7 +223,7 @@ app.post("/orders", async (req, res) => {
       quantity: quantity || 1,
       payment_id,
       city,
-      deliverMethod,
+      deliveryMethod,
       state,
       street,
       zip,
