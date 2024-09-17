@@ -180,6 +180,13 @@ app.post("/orders", async (req, res) => {
     price,
     delivery_time,
     quantity,
+    payment_id,
+    city,
+    deliverMethod,
+    state,
+    street,
+    zip,
+    deliveryFee,
   } = req.body;
 
   // Basic validation
@@ -191,7 +198,14 @@ app.post("/orders", async (req, res) => {
     !delivery_time ||
     !description ||
     !category ||
-    !size
+    !size ||
+    !payment_id ||
+    !city ||
+    !deliverMethod ||
+    !state ||
+    !street ||
+    !zip ||
+    !deliveryFee
   ) {
     return res.status(400).json({ error: "Missing required fields" });
   }
@@ -207,6 +221,13 @@ app.post("/orders", async (req, res) => {
       price,
       delivery_time,
       quantity: quantity || 1,
+      payment_id,
+      city,
+      deliverMethod,
+      state,
+      street,
+      zip,
+      deliveryFee,
     });
 
     await newOrder.save();

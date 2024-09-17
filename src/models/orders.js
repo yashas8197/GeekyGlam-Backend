@@ -39,6 +39,34 @@ const orderSchema = new mongoose.Schema(
       require: true,
       default: 1,
     },
+    payment_id: {
+      type: String,
+      require: true,
+    },
+    city: {
+      type: String,
+      require: true,
+    },
+    deliverMethod: {
+      type: String,
+      require: true,
+    },
+    state: {
+      type: String,
+      require: true,
+    },
+    street: {
+      type: String,
+      require: true,
+    },
+    zip: {
+      type: Number,
+      require: true,
+    },
+    deliveryFee: {
+      type: String,
+      require: true,
+    },
   },
   {
     timestamps: true,
