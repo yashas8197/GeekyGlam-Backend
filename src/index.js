@@ -3,6 +3,19 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const Razorpay = require("razorpay");
+const {
+  getProductsByCategory,
+  getAllProducts,
+  getProductById,
+  updateProductById,
+  getSearchSuggestionByTitle,
+} = require("./contollers/contollers");
+
+const instance = new Razorpay({
+  key_id: process.env.RAZORPAY_API_KEY,
+  key_secret: process.env.RAZORPAY_API_SECRET,
+});
 
 const Products = require("./models/products.model");
 const Order = require("./models/orders");
@@ -18,24 +31,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 initializeDatabase();
-
-async function getProductsByCategory(categoryType) {
-  try {
-    const products = await Products.find({ category: categoryType });
-    return { products: products };
-  } catch (error) {
-    throw error;
-  }
-}
-
-async function getAllProducts() {
-  try {
-    const products = await Products.find();
-    return { products: products };
-  } catch (error) {
-    throw error;
-  }
-}
 
 app.get("/products/:categoryType", async (req, res) => {
   try {
@@ -57,15 +52,6 @@ app.get("/products/:categoryType", async (req, res) => {
   }
 });
 
-async function getProductById(productId) {
-  try {
-    const product = await Products.findById(productId);
-    return product;
-  } catch (error) {
-    throw error;
-  }
-}
-
 app.get("/product/:productId", async (req, res) => {
   const { productId } = req.params;
   try {
@@ -79,22 +65,6 @@ app.get("/product/:productId", async (req, res) => {
     res.status(500).json({ error: "failed to fetch Product" });
   }
 });
-
-async function updateProductById(productId, dataToUpdate) {
-  try {
-    const updatedProduct = await Products.findByIdAndUpdate(
-      productId,
-      dataToUpdate,
-      {
-        new: true,
-      }
-    );
-
-    return updatedProduct;
-  } catch (error) {
-    throw error;
-  }
-}
 
 app.post("/product/:productId", async (req, res) => {
   try {
@@ -248,6 +218,21 @@ app.post("/orders", async (req, res) => {
   }
 });
 
+app.post("/checkout", async (req, res) => {
+  try {
+    const options = req.body;
+
+    const order = await instance.orders.create(options);
+    if (!order) {
+      return res.status(500).send("Error");
+    }
+    res.status(200).json({ success: true, order });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("error");
+  }
+});
+
 // Get Orders
 app.get("/orders", async (req, res) => {
   try {
@@ -276,17 +261,6 @@ app.delete("/orders/:id", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-
-async function getSearchSuggestionByTitle(productTitle) {
-  try {
-    const productSearchByTitle = await Products.find({
-      title: { $regex: productTitle, $options: "i" },
-    });
-    return productSearchByTitle;
-  } catch (error) {
-    throw error;
-  }
-}
 
 app.get("/productsearch", async (req, res) => {
   try {
