@@ -54,10 +54,18 @@ async function getSearchSuggestionByTitle(productTitle) {
   }
 }
 
+async function updateCartStatus() {
+  return await Products.updateMany(
+    { in_cart: true },
+    { $set: { in_cart: false } }
+  );
+}
+
 module.exports = {
   getProductsByCategory,
   getAllProducts,
   getProductById,
   updateProductById,
   getSearchSuggestionByTitle,
+  updateCartStatus,
 };

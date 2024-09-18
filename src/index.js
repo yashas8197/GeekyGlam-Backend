@@ -10,6 +10,7 @@ const {
   getProductById,
   updateProductById,
   getSearchSuggestionByTitle,
+  updateCartStatus,
 } = require("./contollers/contollers");
 
 const instance = new Razorpay({
@@ -166,6 +167,19 @@ app.get("/product/reviews/:id", async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({ error: error.message });
+  }
+});
+
+//clear cart
+app.post("/products/updateCartStatus", async (req, res) => {
+  try {
+    const updatedProducts = await updateCartStatus();
+    res.json({
+      message: "Updated cart status for all products.",
+      updatedProducts,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
