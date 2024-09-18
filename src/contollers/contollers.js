@@ -54,12 +54,20 @@ async function getSearchSuggestionByTitle(productTitle) {
   }
 }
 
-async function updateCartStatus() {
-  return await Products.updateMany(
-    { in_cart: true },
-    { $set: { in_cart: false } }
-  );
-}
+const updateCartStatus = async () => {
+  try {
+    const products = await Products.find(); // Assuming Product is your product model
+
+    for (let product of products) {
+      product.in_cart = false;
+      await product.save();
+    }
+
+    return products;
+  } catch (error) {
+    throw new Error("Error updating cart status.");
+  }
+};
 
 module.exports = {
   getProductsByCategory,
