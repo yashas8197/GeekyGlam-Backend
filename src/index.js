@@ -11,6 +11,11 @@ const {
   updateProductById,
   getSearchSuggestionByTitle,
   updateCartStatus,
+  getOrder,
+  getReviewListById,
+  addNewReview,
+  getProductInCart,
+  getProductWished,
 } = require("./contollers/contollers");
 
 const instance = new Razorpay({
@@ -18,7 +23,6 @@ const instance = new Razorpay({
   key_secret: process.env.RAZORPAY_API_SECRET,
 });
 
-const Products = require("./models/products.model");
 const Order = require("./models/orders");
 
 app.use(express.json());
@@ -88,7 +92,7 @@ app.post("/product/:productId", async (req, res) => {
 
 app.get("/products", async (req, res) => {
   try {
-    const wishedProducts = await Products.find({ is_wished: true });
+    const wishedProducts = getProductWished();
 
     if (wishedProducts.length > 0) {
       res.status(200).json({ wishlist: wishedProducts });
@@ -102,7 +106,7 @@ app.get("/products", async (req, res) => {
 
 app.get("/product", async (req, res) => {
   try {
-    const cartItems = await Products.find({ in_cart: true });
+    const cartItems = await getProductInCart();
     if (cartItems.length > 0) {
       res.status(200).json({ cartItems: cartItems });
     } else {
@@ -122,7 +126,7 @@ app.post("/product/reviews/:id", async (req, res) => {
   }
 
   try {
-    const product = await Products.findById(id);
+    const product = await getProductById(id);
 
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
@@ -136,11 +140,7 @@ app.post("/product/reviews/:id", async (req, res) => {
       avatarPhoto,
     };
 
-    // Add the new review to the reviewsList array
-    product.reviewsList.push(newReview);
-
-    // Save the updated product
-    await product.save();
+    await addNewReview(product, newReview);
 
     return res.status(200).json({
       message: "Review added successfully",
@@ -155,7 +155,7 @@ app.get("/product/reviews/:id", async (req, res) => {
   const { id } = req.params; // Product ID from the URL
 
   try {
-    const product = await Products.findById(id, "reviewsList"); // Fetch only the reviewsList field
+    const product = await getReviewListById(id); // Fetch only the reviewsList field
 
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
@@ -271,7 +271,7 @@ app.post("/checkout", async (req, res) => {
 // Get Orders
 app.get("/orders", async (req, res) => {
   try {
-    const orders = await Order.find();
+    const orders = await getOrder();
     if (orders.length === 0) {
       return res.status(404).json({ message: "No orders found" });
     }

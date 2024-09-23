@@ -1,3 +1,4 @@
+const Order = require("../models/orders");
 const Products = require("../models/products.model");
 
 async function getProductsByCategory(categoryType) {
@@ -69,6 +70,52 @@ const updateCartStatus = async () => {
   }
 };
 
+const getOrder = async () => {
+  try {
+    const orders = await Order.find();
+    return orders;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getReviewListById = async (id) => {
+  try {
+    const product = await Products.findById(id, "reviewsList");
+    return product;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const addNewReview = async (product, newReview) => {
+  try {
+    product.reviewsList.push(newReview);
+
+    await product.save();
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getProductInCart = async () => {
+  try {
+    const cartItems = await Products.find({ in_cart: true });
+    return cartItems;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getProductWished = async () => {
+  try {
+    const wishedProducts = await Products.find({ is_wished: true });
+    return wishedProducts;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   getProductsByCategory,
   getAllProducts,
@@ -76,4 +123,9 @@ module.exports = {
   updateProductById,
   getSearchSuggestionByTitle,
   updateCartStatus,
+  getReviewListById,
+  getOrder,
+  addNewReview,
+  getProductInCart,
+  getProductWished,
 };
