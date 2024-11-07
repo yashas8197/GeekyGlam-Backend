@@ -4,6 +4,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const Razorpay = require("razorpay");
+const cookieParser = require("cookie-parser");
 const {
   getProductsByCategory,
   getAllProducts,
@@ -23,7 +24,14 @@ const instance = new Razorpay({
   key_secret: process.env.RAZORPAY_API_SECRET,
 });
 
-const Order = require("./models/orders");
+const Order = require("./models/orders.model");
+const {
+  userSignUp,
+  loginUser,
+  logoutUser,
+  refreshAccessToken,
+} = require("./contollers/user.contoller");
+const verifyJWT = require("./middlewares/auth.middleware");
 
 app.use(express.json());
 
@@ -32,7 +40,7 @@ const corsOptions = {
   credentials: true,
   optionSuccessStatus: 200,
 };
-
+app.use(cookieParser());
 app.use(cors(corsOptions));
 
 initializeDatabase();
@@ -310,6 +318,12 @@ app.get("/productsearch", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch" });
   }
 });
+
+//auth
+app.post("/api/signup", userSignUp);
+app.post("/api/login", loginUser);
+app.post("/api/logout", verifyJWT, logoutUser);
+app.post("/api/refresh-token", refreshAccessToken);
 
 const PORT = 3000;
 app.listen(PORT, () => {

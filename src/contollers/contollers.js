@@ -1,4 +1,4 @@
-const Order = require("../models/orders");
+const Order = require("../models/orders.model");
 const Products = require("../models/products.model");
 
 async function getProductsByCategory(categoryType) {
